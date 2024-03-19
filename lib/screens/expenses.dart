@@ -43,10 +43,6 @@ class _ExpensesState extends State<ExpensesScreen> {
       );
     }
 
-    return Scaffold(
-        appBar: AppBar(
-          title: const Text('Expenses screen'),
-        ),
-        body: mainContent);
+    return Scaffold(body: mainContent);
   }
 }
