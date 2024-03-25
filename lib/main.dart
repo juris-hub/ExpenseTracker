@@ -1,4 +1,3 @@
-import 'package:expense_tracker/screens/expenses.dart';
 import 'package:expense_tracker/screens/tabs_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
