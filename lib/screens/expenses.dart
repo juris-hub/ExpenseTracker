@@ -1,4 +1,3 @@
-import 'package:expense_tracker/models/category.dart';
 import 'package:expense_tracker/models/expense.dart';
 import 'package:expense_tracker/widgets/add_expense.dart';
 import 'package:expense_tracker/widgets/expenses_list.dart';
@@ -15,12 +14,12 @@ class _ExpensesState extends State<ExpensesScreen> {
   final List<Expense> _registeredExpenses = [
     Expense(
         amount: 19.99,
-        category: Category.work,
+        category: 'Work',
         date: DateTime.now(),
         title: 'Flutter Course'),
     Expense(
         amount: 12.45,
-        category: Category.leisure,
+        category: 'Leisure',
         date: DateTime.now(),
         title: 'A1 bill'),
   ];

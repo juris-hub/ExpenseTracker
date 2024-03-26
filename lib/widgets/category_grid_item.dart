@@ -10,13 +10,13 @@ class CategoryGridItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return InkWell(
-      onTap: onSelectedCategory,
-      splashColor: Theme.of(context).primaryColor,
-      borderRadius: BorderRadius.circular(100),
-      child: Column(
-        children: [
-          Padding(
+    return Column(
+      children: [
+        InkWell(
+          onTap: onSelectedCategory,
+          splashColor: Theme.of(context).primaryColor,
+          borderRadius: BorderRadius.circular(100),
+          child: Padding(
             padding: const EdgeInsets.all(8.0),
             child: Container(
               padding: const EdgeInsets.all(6),
@@ -37,14 +37,14 @@ class CategoryGridItem extends StatelessWidget {
               ),
             ),
           ),
-          Text(
-            category.title,
-            style: Theme.of(context).textTheme.bodyMedium!.copyWith(
-                color: Theme.of(context).colorScheme.onBackground,
-                fontWeight: FontWeight.bold),
-          )
-        ],
-      ),
+        ),
+        Text(
+          category.title,
+          style: Theme.of(context).textTheme.bodyMedium!.copyWith(
+              color: Theme.of(context).colorScheme.onBackground,
+              fontWeight: FontWeight.bold),
+        )
+      ],
     );
   }
 }

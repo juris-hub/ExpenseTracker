@@ -19,10 +19,12 @@ class _NewExpenseState extends State<NewExpense> {
   final _titleController = TextEditingController();
   final _amountController = TextEditingController();
   DateTime? _selectedDate;
-  final _selectedCategory =
+  String _selectedCategory = '';
 
-  void _selectCategory(Categories category) {
-    final 
+  void _selectCategory(String category) {
+    setState(() {
+      _selectedCategory = category;
+    });
   }
 
   // add category to expense object method
@@ -122,18 +124,6 @@ class _NewExpenseState extends State<NewExpense> {
             ],
           ),
           const SizedBox(
-            height: 24,
-          ),
-          Row(
-            children: [
-              const Spacer(),
-              ElevatedButton(
-                onPressed: _submitExpense,
-                child: const Text('Submit'),
-              ),
-            ],
-          ),
-          const SizedBox(
             height: 36,
           ),
           Text(
@@ -158,10 +148,28 @@ class _NewExpenseState extends State<NewExpense> {
               children: [
                 for (final category in availableCategories)
                   CategoryGridItem(
-                      category: category, onSelectedCategory: () {})
+                      category: category,
+                      onSelectedCategory: () {
+                        _selectCategory(category.title);
+                      })
               ],
             ),
-          )
+          ),
+          Container(
+            width: double.infinity,
+            margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
+            child: ElevatedButton(
+              onPressed: _submitExpense,
+              style: ElevatedButton.styleFrom(
+                  backgroundColor: Theme.of(context).colorScheme.surface),
+              child: Text(
+                'Add expense',
+                style: Theme.of(context).textTheme.bodyLarge!.copyWith(
+                    color: Theme.of(context).colorScheme.secondary,
+                    fontWeight: FontWeight.bold),
+              ),
+            ),
+          ),
         ],
       ),
     );
