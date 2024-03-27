@@ -12,11 +12,12 @@ const categoryIcons = {
 };
 
 class Categories {
-  const Categories(
-      {required this.id,
-      required this.title,
-      required this.color,
-      required this.icon});
+  const Categories({
+    required this.id,
+    required this.title,
+    required this.color,
+    required this.icon,
+  });
 
   final String id;
   final String title;

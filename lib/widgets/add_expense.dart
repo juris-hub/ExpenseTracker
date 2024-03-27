@@ -21,9 +21,14 @@ class _NewExpenseState extends State<NewExpense> {
   DateTime? _selectedDate;
   String _selectedCategory = '';
 
-  void _selectCategory(String category) {
+  List<bool> _isCategoryTapped = List.filled(availableCategories.length, false);
+
+  void _selectCategory(String category, int index) {
     setState(() {
       _selectedCategory = category;
+
+      _isCategoryTapped = List.filled(availableCategories.length, false);
+      _isCategoryTapped[index] = !_isCategoryTapped[index];
     });
   }
 
@@ -137,27 +142,34 @@ class _NewExpenseState extends State<NewExpense> {
             height: 16,
           ),
           Expanded(
-            child: GridView(
-              physics: const NeverScrollableScrollPhysics(),
-              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 4,
-                childAspectRatio: 0.70,
-                crossAxisSpacing: 40,
-                mainAxisSpacing: 15,
-              ),
-              children: [
-                for (final category in availableCategories)
-                  CategoryGridItem(
-                      category: category,
-                      onSelectedCategory: () {
-                        _selectCategory(category.title);
-                      })
-              ],
-            ),
+            child: GridView.builder(
+                itemCount: availableCategories.length,
+                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: 4,
+                  childAspectRatio: 0.7,
+                  crossAxisSpacing: 40,
+                  mainAxisSpacing: 15,
+                ),
+                itemBuilder: (ctx, index) {
+                  final category = availableCategories[index];
+                  return CategoryGridItem(
+                    category: category,
+                    isTapped: _isCategoryTapped[index],
+                    onSelectedCategory: () {
+                      _selectCategory(category.title, index);
+                    },
+                  );
+                }),
           ),
           Container(
             width: double.infinity,
             margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
+            decoration: BoxDecoration(
+                border: Border.all(
+                  color: Theme.of(context).colorScheme.onBackground,
+                  width: 2,
+                ),
+                borderRadius: BorderRadius.circular(25)),
             child: ElevatedButton(
               onPressed: _submitExpense,
               style: ElevatedButton.styleFrom(
