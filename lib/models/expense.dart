@@ -1,4 +1,3 @@
-import 'package:expense_tracker/models/category.dart';
 import 'package:intl/intl.dart';
 import 'package:uuid/uuid.dart';
 
@@ -18,7 +17,7 @@ class Expense {
   final double amount;
   final String id;
   final DateTime date;
-  final Category category;
+  final String category;
 
   String get formattedDate {
     return formatter.format(date);

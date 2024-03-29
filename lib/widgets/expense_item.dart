@@ -9,6 +9,13 @@ class ExpenseItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    IconData categoryIcon = Icons.question_mark;
+    for (Categories category in availableCategories) {
+      if (category.title == expense.category) {
+        categoryIcon = category.icon;
+      }
+    }
+
     return Card(
         child: Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
@@ -28,9 +35,7 @@ class ExpenseItem extends StatelessWidget {
               const Spacer(),
               Row(
                 children: [
-                  Icon(
-                    categoryIcons[expense.category],
-                  ),
+                  Icon(categoryIcon),
                   const SizedBox(
                     width: 8,
                   ),

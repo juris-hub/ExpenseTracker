@@ -22,6 +22,10 @@ class _TabsScreenState extends State<TabsScreen> {
     Widget activePage = const ExpensesScreen();
     var activePageTitle = 'Expenses';
 
+    if (_selectedScreenIndex == 1) {
+      // activePage = const AddExpenseScreen();
+    }
+
     return Scaffold(
       appBar: AppBar(
         title: Text(activePageTitle),
@@ -35,7 +39,8 @@ class _TabsScreenState extends State<TabsScreen> {
             icon: Icon(Icons.wallet),
             label: 'Expenses',
           ),
-          BottomNavigationBarItem(icon: Icon(Icons.add), label: 'Add'),
+          BottomNavigationBarItem(
+              icon: Icon(Icons.add), label: 'Under development'),
         ],
       ),
     );
