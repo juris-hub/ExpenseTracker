@@ -1,21 +1,19 @@
 import 'package:expense_tracker/models/expense.dart';
+import 'package:expense_tracker/providers/expense.provider.dart';
 import 'package:expense_tracker/widgets/category_grid_item.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../models/category.dart';
 
-class NewExpense extends StatefulWidget {
-  const NewExpense({super.key, required this.onAddExpense});
-
-  final void Function(Expense expense) onAddExpense;
+class NewExpense extends ConsumerStatefulWidget {
+  const NewExpense({super.key});
 
   @override
-  State<NewExpense> createState() => _NewExpenseState();
+  ConsumerState<NewExpense> createState() => _NewExpenseState();
 }
 
-class _NewExpenseState extends State<NewExpense> {
+class _NewExpenseState extends ConsumerState<NewExpense> {
   final _titleController = TextEditingController();
   final _amountController = TextEditingController();
   DateTime? _selectedDate;
@@ -70,13 +68,11 @@ class _NewExpenseState extends State<NewExpense> {
       return;
     }
 
-    widget.onAddExpense(
-      Expense(
-          title: _titleController.text,
-          amount: enteredAmount,
-          date: _selectedDate!,
-          category: _selectedCategory),
-    );
+    ref.watch(expenseProvider.notifier).newExpense(Expense(
+        title: _titleController.text,
+        amount: enteredAmount,
+        date: _selectedDate!,
+        category: _selectedCategory));
 
     Navigator.pop(context);
   }
