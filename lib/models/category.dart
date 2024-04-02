@@ -1,16 +1,5 @@
 import 'package:flutter/material.dart';
 
-enum Category { food, travel, leisure, work, test, test123 }
-
-const categoryIcons = {
-  Category.food: Icons.lunch_dining,
-  Category.travel: Icons.flight_takeoff,
-  Category.leisure: Icons.movie,
-  Category.work: Icons.work,
-  Category.test: Icons.abc,
-  Category.test123: Icons.abc_outlined
-};
-
 class Categories {
   const Categories({
     required this.id,
