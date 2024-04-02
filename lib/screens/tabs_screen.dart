@@ -1,4 +1,5 @@
 import 'package:expense_tracker/screens/expenses.dart';
+import 'package:expense_tracker/widgets/new_expense.dart';
 import 'package:flutter/material.dart';
 
 class TabsScreen extends StatefulWidget {
@@ -17,6 +18,14 @@ class _TabsScreenState extends State<TabsScreen> {
     });
   }
 
+  void _addExpense() {
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (ctx) => const NewExpense(),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     Widget activePage = const ExpensesScreen();
@@ -29,6 +38,12 @@ class _TabsScreenState extends State<TabsScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Text(activePageTitle),
+        actions: [
+          IconButton(
+            onPressed: _addExpense,
+            icon: const Icon(Icons.add),
+          ),
+        ],
       ),
       body: activePage,
       bottomNavigationBar: BottomNavigationBar(
