@@ -16,8 +16,8 @@ class NewExpense extends ConsumerStatefulWidget {
 }
 
 class _NewExpenseState extends ConsumerState<NewExpense> {
-  final _titleController = TextEditingController();
-  final _amountController = TextEditingController();
+  var _enteredTitle = '';
+  var _eneteredAmount = '';
   DateTime? _selectedDate;
   String _selectedCategory = '';
 
@@ -46,12 +46,11 @@ class _NewExpenseState extends ConsumerState<NewExpense> {
   }
 
   void _submitExpense() {
-    final enteredAmount = double.tryParse(_amountController.text);
-
     if (widget.formKey.currentState!.validate()) {
+      widget.formKey.currentState!.save();
       ref.watch(expenseProvider.notifier).newExpense(Expense(
-          title: _titleController.text,
-          amount: enteredAmount!,
+          title: _enteredTitle,
+          amount: double.tryParse(_eneteredAmount)!,
           date: _selectedDate!,
           category: _selectedCategory));
       Navigator.pop(context);
@@ -71,7 +70,6 @@ class _NewExpenseState extends ConsumerState<NewExpense> {
           child: Column(
             children: [
               TextFormField(
-                controller: _titleController,
                 maxLength: 50,
                 decoration: const InputDecoration(
                   label: Text('Title'),
@@ -84,6 +82,9 @@ class _NewExpenseState extends ConsumerState<NewExpense> {
                   }
                   return null;
                 },
+                onSaved: (value) {
+                  _enteredTitle = value!;
+                },
               ),
               const SizedBox(
                 height: 16,
@@ -92,7 +93,6 @@ class _NewExpenseState extends ConsumerState<NewExpense> {
                 children: [
                   Expanded(
                     child: TextFormField(
-                      controller: _amountController,
                       keyboardType: TextInputType.number,
                       decoration: const InputDecoration(
                         prefixText: '€ ',
@@ -106,6 +106,9 @@ class _NewExpenseState extends ConsumerState<NewExpense> {
                           return 'Must be a valid, positive number !';
                         }
                         return null;
+                      },
+                      onSaved: (value) {
+                        _eneteredAmount = value!;
                       },
                     ),
                   ),
