@@ -7,7 +7,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../models/category.dart';
 
 class NewExpense extends ConsumerStatefulWidget {
-  const NewExpense({super.key});
+  const NewExpense({super.key, required this.formKey});
+
+  final GlobalKey<FormState> formKey;
 
   @override
   ConsumerState<NewExpense> createState() => _NewExpenseState();
@@ -45,36 +47,15 @@ class _NewExpenseState extends ConsumerState<NewExpense> {
 
   void _submitExpense() {
     final enteredAmount = double.tryParse(_amountController.text);
-    final amountIsInvalid = enteredAmount == null || enteredAmount <= 0;
 
-    if (_titleController.text.trim().isEmpty || amountIsInvalid) {
-      showDialog(
-        context: context,
-        builder: (ctx) => AlertDialog(
-          title: const Text(
-            ('Invalid input'),
-          ),
-          content: const Text(
-              'Please make sure a valid title, amount, date and category was entered.'),
-          actions: [
-            TextButton(
-                onPressed: () {
-                  Navigator.pop(ctx);
-                },
-                child: const Text('Okay'))
-          ],
-        ),
-      );
-      return;
+    if (widget.formKey.currentState!.validate()) {
+      ref.watch(expenseProvider.notifier).newExpense(Expense(
+          title: _titleController.text,
+          amount: enteredAmount!,
+          date: _selectedDate!,
+          category: _selectedCategory));
+      Navigator.pop(context);
     }
-
-    ref.watch(expenseProvider.notifier).newExpense(Expense(
-        title: _titleController.text,
-        amount: enteredAmount,
-        date: _selectedDate!,
-        category: _selectedCategory));
-
-    Navigator.pop(context);
   }
 
   @override
@@ -85,104 +66,126 @@ class _NewExpenseState extends ConsumerState<NewExpense> {
       ),
       body: Padding(
         padding: const EdgeInsets.fromLTRB(16, 48, 16, 16),
-        child: Column(
-          children: [
-            TextField(
-              controller: _titleController,
-              maxLength: 50,
-              decoration: const InputDecoration(
-                label: Text('Title'),
-              ),
-            ),
-            const SizedBox(
-              height: 16,
-            ),
-            Row(
-              children: [
-                Expanded(
-                  child: TextField(
-                    controller: _amountController,
-                    keyboardType: TextInputType.number,
-                    decoration: const InputDecoration(
-                      prefixText: '€ ',
-                      label: Text('Amount'),
-                    ),
-                  ),
+        child: Form(
+          key: widget.formKey,
+          child: Column(
+            children: [
+              TextFormField(
+                controller: _titleController,
+                maxLength: 50,
+                decoration: const InputDecoration(
+                  label: Text('Title'),
                 ),
-                const SizedBox(width: 16),
-                Expanded(
-                    child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  children: [
-                    Text(_selectedDate == null
-                        ? 'No date selected'
-                        : formatter.format(_selectedDate!)),
-                    IconButton(
-                      onPressed: _presentDatePicker,
-                      icon: const Icon(
-                        Icons.calendar_month,
+                validator: (value) {
+                  if (value == null ||
+                      value.isEmpty ||
+                      value.trim().length <= 1) {
+                    return 'Must be between 1 and 50 characters.';
+                  }
+                  return null;
+                },
+              ),
+              const SizedBox(
+                height: 16,
+              ),
+              Row(
+                children: [
+                  Expanded(
+                    child: TextFormField(
+                      controller: _amountController,
+                      keyboardType: TextInputType.number,
+                      decoration: const InputDecoration(
+                        prefixText: '€ ',
+                        label: Text('Amount'),
                       ),
-                    ),
-                  ],
-                ))
-              ],
-            ),
-            const SizedBox(
-              height: 36,
-            ),
-            Text(
-              'Categories',
-              style: Theme.of(context)
-                  .textTheme
-                  .titleMedium!
-                  .copyWith(fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(
-              height: 16,
-            ),
-            Expanded(
-              child: GridView.builder(
-                  itemCount: availableCategories.length,
-                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 4,
-                    childAspectRatio: 0.7,
-                    crossAxisSpacing: 40,
-                    mainAxisSpacing: 15,
-                  ),
-                  itemBuilder: (ctx, index) {
-                    final category = availableCategories[index];
-                    return CategoryGridItem(
-                      category: category,
-                      isTapped: _isCategoryTapped[index],
-                      onSelectedCategory: () {
-                        _selectCategory(category.title, index);
+                      validator: (value) {
+                        if (value == null ||
+                            value.isEmpty ||
+                            int.tryParse(value) == null ||
+                            int.tryParse(value)! <= 0) {
+                          return 'Must be a valid, positive number !';
+                        }
+                        return null;
                       },
-                    );
-                  }),
-            ),
-            Container(
-              width: double.infinity,
-              margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
-              decoration: BoxDecoration(
-                  border: Border.all(
-                    color: Theme.of(context).colorScheme.onBackground,
-                    width: 2,
+                    ),
                   ),
-                  borderRadius: BorderRadius.circular(25)),
-              child: ElevatedButton(
-                onPressed: _submitExpense,
-                style: ElevatedButton.styleFrom(
-                    backgroundColor: Theme.of(context).colorScheme.surface),
-                child: Text(
-                  'Add expense',
-                  style: Theme.of(context).textTheme.bodyLarge!.copyWith(
-                      color: Theme.of(context).colorScheme.secondary,
-                      fontWeight: FontWeight.bold),
+                  const SizedBox(width: 16),
+                  Expanded(
+                      child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      Text(_selectedDate == null
+                          ? 'No date selected'
+                          : formatter.format(_selectedDate!)),
+                      IconButton(
+                        onPressed: _presentDatePicker,
+                        icon: const Icon(
+                          Icons.calendar_month,
+                        ),
+                      ),
+                    ],
+                  ))
+                ],
+              ),
+              const SizedBox(
+                height: 36,
+              ),
+              Text(
+                'Categories',
+                style: Theme.of(context)
+                    .textTheme
+                    .titleMedium!
+                    .copyWith(fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(
+                height: 16,
+              ),
+              Expanded(
+                child: GridView.builder(
+                    itemCount: availableCategories.length,
+                    gridDelegate:
+                        const SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: 4,
+                      childAspectRatio: 0.7,
+                      crossAxisSpacing: 40,
+                      mainAxisSpacing: 15,
+                    ),
+                    itemBuilder: (ctx, index) {
+                      final category = availableCategories[index];
+                      return CategoryGridItem(
+                        category: category,
+                        isTapped: _isCategoryTapped[index],
+                        onSelectedCategory: () {
+                          _selectCategory(category.title, index);
+                        },
+                      );
+                    }),
+              ),
+              Container(
+                width: double.infinity,
+                margin:
+                    const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
+                decoration: BoxDecoration(
+                    border: Border.all(
+                      color: Theme.of(context).colorScheme.onBackground,
+                      width: 2,
+                    ),
+                    borderRadius: BorderRadius.circular(25)),
+                child: ElevatedButton(
+                  onPressed: _submitExpense,
+                  style: ElevatedButton.styleFrom(
+                      backgroundColor: Theme.of(context).colorScheme.surface),
+                  child: Text(
+                    'Add expense',
+                    style: Theme.of(context).textTheme.bodyLarge!.copyWith(
+                        color: Theme.of(context).colorScheme.secondary,
+                        fontWeight: FontWeight.bold),
+                  ),
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

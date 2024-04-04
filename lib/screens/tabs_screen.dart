@@ -1,15 +1,17 @@
 import 'package:expense_tracker/screens/expenses.dart';
 import 'package:expense_tracker/widgets/new_expense.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class TabsScreen extends StatefulWidget {
+class TabsScreen extends ConsumerStatefulWidget {
   const TabsScreen({super.key});
 
   @override
-  State<TabsScreen> createState() => _TabsScreenState();
+  ConsumerState<TabsScreen> createState() => _TabsScreenState();
 }
 
-class _TabsScreenState extends State<TabsScreen> {
+class _TabsScreenState extends ConsumerState<TabsScreen> {
+  final _formKey = GlobalKey<FormState>();
   int _selectedScreenIndex = 0;
 
   void _selectScreen(int index) {
@@ -21,7 +23,9 @@ class _TabsScreenState extends State<TabsScreen> {
   void _addExpense() {
     Navigator.of(context).push(
       MaterialPageRoute(
-        builder: (ctx) => const NewExpense(),
+        builder: (ctx) => NewExpense(
+          formKey: _formKey,
+        ),
       ),
     );
   }
