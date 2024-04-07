@@ -1,5 +1,4 @@
 import 'package:expense_tracker/providers/expense.provider.dart';
-import 'package:expense_tracker/widgets/add_expense.dart';
 import 'package:expense_tracker/widgets/expenses_list.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -12,13 +11,6 @@ class ExpensesScreen extends ConsumerStatefulWidget {
 }
 
 class _ExpensesState extends ConsumerState<ExpensesScreen> {
-  void _openAddExpenseOverlay() {
-    showModalBottomSheet(
-        context: context,
-        isScrollControlled: true,
-        builder: (ctx) => const NewExpense());
-  }
-
   @override
   Widget build(BuildContext context) {
     final registeredExpenses = ref.watch(expenseProvider);
@@ -35,14 +27,6 @@ class _ExpensesState extends ConsumerState<ExpensesScreen> {
 
     return Scaffold(
       body: mainContent,
-      appBar: AppBar(
-        actions: [
-          IconButton(
-            onPressed: _openAddExpenseOverlay,
-            icon: const Icon(Icons.add),
-          ),
-        ],
-      ),
     );
   }
 }
