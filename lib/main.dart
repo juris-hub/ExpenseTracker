@@ -1,3 +1,6 @@
+import 'dart:io';
+
+import 'package:expense_tracker/overrides/myhttpoverride.dart';
 import 'package:expense_tracker/screens/tabs_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -13,6 +16,7 @@ final theme = ThemeData(
 );
 
 void main() {
+  HttpOverrides.global = MyHttpOverrides();
   runApp(
     const ProviderScope(
       child: MyApp(),

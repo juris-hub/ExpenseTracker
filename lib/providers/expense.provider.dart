@@ -5,11 +5,13 @@ class ExpenseNotifier extends StateNotifier<List<Expense>> {
   ExpenseNotifier()
       : super([
           Expense(
+              id: 'test1',
               amount: 19.99,
               category: 'Work',
               date: DateTime.now(),
               title: 'Flutter Course'),
           Expense(
+              id: 'test2',
               amount: 12.45,
               category: 'Leisure',
               date: DateTime.now(),

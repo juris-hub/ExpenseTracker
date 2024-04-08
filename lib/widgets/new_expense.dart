@@ -1,8 +1,11 @@
+import 'dart:convert';
+
 import 'package:expense_tracker/models/expense.dart';
 import 'package:expense_tracker/providers/expense.provider.dart';
 import 'package:expense_tracker/widgets/category_grid_item.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:http/http.dart' as http;
 
 import '../models/category.dart';
 
@@ -45,14 +48,37 @@ class _NewExpenseState extends ConsumerState<NewExpense> {
     });
   }
 
-  void _submitExpense() {
+  void _submitExpense() async {
     if (widget.formKey.currentState!.validate()) {
       widget.formKey.currentState!.save();
-      ref.watch(expenseProvider.notifier).newExpense(Expense(
-          title: _enteredTitle,
-          amount: double.tryParse(_eneteredAmount)!,
-          date: _selectedDate!,
-          category: _selectedCategory));
+      ref.watch(expenseProvider.notifier).newExpense(
+            Expense(
+              id: 'test',
+              title: _enteredTitle,
+              amount: double.tryParse(_eneteredAmount)!,
+              date: _selectedDate!,
+              category: _selectedCategory,
+            ),
+          );
+
+      final url = Uri.tryParse('https://10.0.2.2:7164/api/Expenses');
+
+      final response = await http.post(
+        url!,
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
+        },
+        body: json.encode({
+          "id": "string",
+          "title": _enteredTitle,
+          "amount": _eneteredAmount,
+          "date": _selectedDate.toString(),
+          "category": _selectedCategory
+        }),
+      );
+      print(response.statusCode);
+
       Navigator.pop(context);
     }
   }
