@@ -1,16 +1,17 @@
+import 'package:expense_tracker/providers/expense.provider.dart';
 import 'package:expense_tracker/screens/expenses.dart';
 import 'package:expense_tracker/widgets/new_expense.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class TabsScreen extends StatefulWidget {
+class TabsScreen extends ConsumerStatefulWidget {
   const TabsScreen({super.key});
 
   @override
-  State<TabsScreen> createState() => _TabsScreenState();
+  ConsumerState<TabsScreen> createState() => _TabsScreenState();
 }
 
-class _TabsScreenState extends State<TabsScreen> {
-  final _formKey = GlobalKey<FormState>();
+class _TabsScreenState extends ConsumerState<TabsScreen> {
   int _selectedScreenIndex = 0;
 
   void _selectScreen(int index) {
@@ -19,19 +20,21 @@ class _TabsScreenState extends State<TabsScreen> {
     });
   }
 
-  void _addExpense() {
-    Navigator.of(context).push(
+  void _addExpense() async {
+    final newExpense = await Navigator.of(context).push<int>(
       MaterialPageRoute(
-        builder: (ctx) => NewExpense(
-          formKey: _formKey,
-        ),
+        builder: (ctx) => const NewExpense(),
       ),
     );
+
+    if (newExpense == 200) {
+      ref.read(expensesProvider.notifier).fetchExpenses();
+      return;
+    }
   }
 
   @override
   Widget build(BuildContext context) {
-    Widget activePage = const ExpensesScreen();
     var activePageTitle = 'Expenses';
 
     if (_selectedScreenIndex == 1) {
@@ -48,7 +51,7 @@ class _TabsScreenState extends State<TabsScreen> {
           ),
         ],
       ),
-      body: activePage,
+      body: const ExpensesScreen(),
       bottomNavigationBar: BottomNavigationBar(
         onTap: _selectScreen,
         currentIndex: _selectedScreenIndex,

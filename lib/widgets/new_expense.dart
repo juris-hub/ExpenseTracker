@@ -3,13 +3,12 @@ import 'package:expense_tracker/providers/expense.provider.dart';
 import 'package:expense_tracker/widgets/category_grid_item.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-
 import '../models/category.dart';
 
 class NewExpense extends ConsumerStatefulWidget {
-  const NewExpense({super.key, required this.formKey});
+  const NewExpense({super.key, this.expense});
 
-  final GlobalKey<FormState> formKey;
+  final Expense? expense;
 
   @override
   ConsumerState<NewExpense> createState() => _NewExpenseState();
@@ -18,8 +17,10 @@ class NewExpense extends ConsumerStatefulWidget {
 class _NewExpenseState extends ConsumerState<NewExpense> {
   var _enteredTitle = '';
   var _eneteredAmount = '';
-  DateTime? _selectedDate;
-  String _selectedCategory = '';
+  late DateTime? _selectedDate = widget.expense?.date ?? DateTime.now();
+  late String _selectedCategory = widget.expense?.category ?? '';
+  var _isSending = false;
+  final _formKey = GlobalKey<FormState>();
 
   List<bool> _isCategoryTapped = List.filled(availableCategories.length, false);
 
@@ -45,31 +46,58 @@ class _NewExpenseState extends ConsumerState<NewExpense> {
     });
   }
 
-  void _submitExpense() {
-    if (widget.formKey.currentState!.validate()) {
-      widget.formKey.currentState!.save();
-      ref.watch(expenseProvider.notifier).newExpense(Expense(
-          title: _enteredTitle,
-          amount: double.tryParse(_eneteredAmount)!,
-          date: _selectedDate!,
-          category: _selectedCategory));
-      Navigator.pop(context);
+  void _addExpense() async {
+    if (_formKey.currentState!.validate()) {
+      _formKey.currentState!.save();
+      setState(() {
+        _isSending = true;
+      });
+
+      int response;
+
+      if (widget.expense != null && widget.expense!.id!.isNotEmpty) {
+        response = await ref.watch(expensesProvider.notifier).editExpense(
+            Expense(
+                id: widget.expense!.id,
+                title: _enteredTitle,
+                amount: double.parse(_eneteredAmount),
+                date: _selectedDate!,
+                category: _selectedCategory),
+            widget.expense!.id!);
+      } else {
+        response = await ref.watch(expensesProvider.notifier).addExpense(
+              Expense(
+                  title: _enteredTitle,
+                  amount: double.parse(_eneteredAmount),
+                  date: _selectedDate!,
+                  category: _selectedCategory),
+            );
+      }
+
+      Navigator.of(context).pop(response);
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    var buttonText;
+
+    widget.expense != null
+        ? buttonText = 'Edit expense'
+        : buttonText = 'Add expense';
+
     return Scaffold(
       appBar: AppBar(
-        title: const Text('New Expense'),
+        title: Text(widget.expense?.title ?? "New expense"),
       ),
       body: Padding(
         padding: const EdgeInsets.fromLTRB(16, 48, 16, 16),
         child: Form(
-          key: widget.formKey,
+          key: _formKey,
           child: Column(
             children: [
               TextFormField(
+                initialValue: widget.expense?.title ?? '',
                 maxLength: 50,
                 decoration: const InputDecoration(
                   label: Text('Title'),
@@ -93,6 +121,7 @@ class _NewExpenseState extends ConsumerState<NewExpense> {
                 children: [
                   Expanded(
                     child: TextFormField(
+                      initialValue: widget.expense?.amount.toString() ?? '',
                       keyboardType: TextInputType.number,
                       decoration: const InputDecoration(
                         prefixText: '€ ',
@@ -101,8 +130,8 @@ class _NewExpenseState extends ConsumerState<NewExpense> {
                       validator: (value) {
                         if (value == null ||
                             value.isEmpty ||
-                            int.tryParse(value) == null ||
-                            int.tryParse(value)! <= 0) {
+                            double.tryParse(value) == null ||
+                            double.tryParse(value)! <= 0) {
                           return 'Must be a valid, positive number !';
                         }
                         return null;
@@ -156,6 +185,10 @@ class _NewExpenseState extends ConsumerState<NewExpense> {
                     ),
                     itemBuilder: (ctx, index) {
                       final category = availableCategories[index];
+                      if (widget.expense != null &&
+                          widget.expense!.category == category.title) {
+                        _isCategoryTapped[index] = true;
+                      }
                       return CategoryGridItem(
                         category: category,
                         isTapped: _isCategoryTapped[index],
@@ -176,15 +209,25 @@ class _NewExpenseState extends ConsumerState<NewExpense> {
                     ),
                     borderRadius: BorderRadius.circular(25)),
                 child: ElevatedButton(
-                  onPressed: _submitExpense,
+                  onPressed: _isSending ? null : _addExpense,
                   style: ElevatedButton.styleFrom(
                       backgroundColor: Theme.of(context).colorScheme.surface),
-                  child: Text(
-                    'Add expense',
-                    style: Theme.of(context).textTheme.bodyLarge!.copyWith(
-                        color: Theme.of(context).colorScheme.secondary,
-                        fontWeight: FontWeight.bold),
-                  ),
+                  child: _isSending
+                      ? const SizedBox(
+                          height: 16,
+                          width: 16,
+                          child: CircularProgressIndicator(),
+                        )
+                      : Text(
+                          buttonText,
+                          style: Theme.of(context)
+                              .textTheme
+                              .bodyLarge!
+                              .copyWith(
+                                  color:
+                                      Theme.of(context).colorScheme.secondary,
+                                  fontWeight: FontWeight.bold),
+                        ),
                 ),
               ),
             ],

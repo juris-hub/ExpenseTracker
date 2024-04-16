@@ -10,12 +10,12 @@ class Expense {
       {required this.title,
       required this.amount,
       required this.date,
-      required this.category})
-      : id = uuid.v4();
+      required this.category,
+      this.id});
 
   final String title;
-  final double amount;
-  final String id;
+  final num amount;
+  final String? id;
   final DateTime date;
   final String category;
 
