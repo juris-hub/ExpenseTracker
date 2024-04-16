@@ -11,11 +11,11 @@ class Expense {
       required this.amount,
       required this.date,
       required this.category,
-      required this.id});
+      this.id});
 
   final String title;
-  final double amount;
-  final String id;
+  final num amount;
+  final String? id;
   final DateTime date;
   final String category;
 
