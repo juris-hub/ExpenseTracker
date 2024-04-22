@@ -1,5 +1,6 @@
 import 'package:expense_tracker/models/expense.dart';
 import 'package:expense_tracker/providers/expense.provider.dart';
+import 'package:expense_tracker/services/models/expense_request.dart';
 import 'package:expense_tracker/widgets/category_grid_item.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -56,21 +57,26 @@ class _NewExpenseState extends ConsumerState<NewExpense> {
       int response;
 
       if (widget.expense != null && widget.expense!.id!.isNotEmpty) {
+        var expenseId = widget.expense!.id;
         response = await ref.watch(expensesProvider.notifier).editExpense(
-            Expense(
-                id: widget.expense!.id,
-                title: _enteredTitle,
-                amount: double.parse(_eneteredAmount),
-                date: _selectedDate!,
-                category: _selectedCategory),
-            widget.expense!.id!);
+              ExpenseRequest(
+                Expense(
+                    id: expenseId,
+                    title: _enteredTitle,
+                    amount: double.parse(_eneteredAmount),
+                    date: _selectedDate!,
+                    category: _selectedCategory),
+              ),
+            );
       } else {
         response = await ref.watch(expensesProvider.notifier).addExpense(
-              Expense(
-                  title: _enteredTitle,
-                  amount: double.parse(_eneteredAmount),
-                  date: _selectedDate!,
-                  category: _selectedCategory),
+              ExpenseRequest(
+                Expense(
+                    title: _enteredTitle,
+                    amount: double.parse(_eneteredAmount),
+                    date: _selectedDate!,
+                    category: _selectedCategory),
+              ),
             );
       }
 
@@ -80,7 +86,7 @@ class _NewExpenseState extends ConsumerState<NewExpense> {
 
   @override
   Widget build(BuildContext context) {
-    var buttonText;
+    String buttonText;
 
     widget.expense != null
         ? buttonText = 'Edit expense'

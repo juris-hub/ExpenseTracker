@@ -34,22 +34,27 @@ class _ExpensesListState extends ConsumerState<ExpensesList> {
       return mainContent;
     }
 
-    return ListView.builder(
-      itemCount: expenses.length,
-      itemBuilder: (context, index) => Dismissible(
-        onDismissed: (direction) {
-          ref
-              .watch(expensesProvider.notifier)
-              .deleteExpense(expenses[index].id!);
-        },
-        key: UniqueKey(),
-        child: GestureDetector(
-          onTap: () => Navigator.of(context).push(MaterialPageRoute(
-              builder: (ctx) => NewExpense(
-                    expense: expenses[index],
-                  ))),
-          child: ExpenseItem(
-            expense: expenses[index],
+    return RefreshIndicator(
+      onRefresh: () async {
+        ref.watch(expensesProvider.notifier).fetchExpenses();
+      },
+      child: ListView.builder(
+        itemCount: expenses.length,
+        itemBuilder: (context, index) => Dismissible(
+          onDismissed: (direction) {
+            ref
+                .watch(expensesProvider.notifier)
+                .deleteExpense(expenses[index].id!);
+          },
+          key: UniqueKey(),
+          child: GestureDetector(
+            onTap: () => Navigator.of(context).push(MaterialPageRoute(
+                builder: (ctx) => NewExpense(
+                      expense: expenses[index],
+                    ))),
+            child: ExpenseItem(
+              expense: expenses[index],
+            ),
           ),
         ),
       ),

@@ -22,4 +22,14 @@ class Expense {
   String get formattedDate {
     return formatter.format(date);
   }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'title': title,
+      'amount': amount,
+      'date': date.toIso8601String(),
+      'category': category,
+    };
+  }
 }

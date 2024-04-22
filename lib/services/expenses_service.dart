@@ -1,4 +1,5 @@
 import 'package:expense_tracker/models/expense.dart';
+import 'package:expense_tracker/services/models/expense_request.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
@@ -26,37 +27,28 @@ class ExpensesService {
     await http.delete(url);
   }
 
-  Future<int> addExpense(Expense expense) async {
+  Future<int> addExpense(ExpenseRequest request) async {
     final url = Uri.parse('https://10.0.2.2:7164/api/Expenses');
     final response = await http.post(url,
         headers: {
           'Content-Type': 'application/json',
           'Accept': 'application/json'
         },
-        body: json.encode({
-          "title": expense.title,
-          "amount": expense.amount,
-          "date": expense.date.toIso8601String(),
-          "category": expense.category,
-        }));
+        body: json.encode(request.toJson()));
 
     return response.statusCode;
   }
 
-  Future<int> editExpense(Expense expense, String id) async {
-    final url = Uri.parse('https://10.0.2.2:7164/api/Expenses/${id}');
+  Future<int> editExpense(ExpenseRequest request) async {
+    print(request.expense.id);
+    final url =
+        Uri.parse('https://10.0.2.2:7164/api/Expenses/${request.expense.id}');
     final response = await http.put(url,
         headers: {
           'Content-Type': 'application/json',
           'Accept': 'application/json'
         },
-        body: json.encode({
-          "id": expense.id,
-          "title": expense.title,
-          "amount": expense.amount,
-          "date": expense.date.toIso8601String(),
-          "category": expense.category,
-        }));
+        body: json.encode(ExpenseRequest(request.expense)));
 
     return response.statusCode;
   }
