@@ -1,5 +1,6 @@
 import 'package:expense_tracker/models/expense.dart';
 import 'package:expense_tracker/services/expenses_service.dart';
+import 'package:expense_tracker/services/models/expense_request.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 final expensesProvider = StateNotifierProvider<ExpensesNotifier, List<Expense>>(
@@ -23,13 +24,13 @@ class ExpensesNotifier extends StateNotifier<List<Expense>> {
     state = expenses;
   }
 
-  Future<int> addExpense(Expense expense) async {
-    final response = await _expensesService.addExpense(expense);
+  Future<int> addExpense(ExpenseRequest request) async {
+    final response = await _expensesService.addExpense(request);
     return response;
   }
 
-  Future<int> editExpense(Expense expense, String id) async {
-    final response = await _expensesService.editExpense(expense, id);
+  Future<int> editExpense(ExpenseRequest request) async {
+    final response = await _expensesService.editExpense(request);
     final expenses = await _expensesService.fetchExpenses();
     state = expenses;
 
